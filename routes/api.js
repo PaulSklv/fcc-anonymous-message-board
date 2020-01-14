@@ -24,7 +24,11 @@ module.exports = function (app) {
   
   app.route('/api/threads/:board').post((req, res) => {
     connection.then(client => {
-      collection(client)
+      collection(client).insertOne({
+        text: req.body.text,
+        delete_password: req.body.delete_password,
+        
+      })
     })
   })
     

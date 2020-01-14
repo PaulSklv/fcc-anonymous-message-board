@@ -27,6 +27,8 @@ module.exports = function (app) {
       collection(client).insertOne({
         text: req.body.text,
         delete_password: req.body.delete_password,
+        created_on: new Date(),
+        bumped_on: new Date(),
         
       })
     })

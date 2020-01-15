@@ -78,17 +78,19 @@ module.exports = function(app) {
     })
     .put((req, res) => {
       connection.then(client => {
-        collection(client, req).findOneAndUpdate(
-          { _id: new ObjectID(req.body.report_id) },
-          { $set: { reported: true } },
-          { returnOriginal: false }
-        ).then(result => {
-          if(result.value === null) {
-            return res.send("thread doesn't esists!")
-          } else {
-            return res.send("success!")
-          }
-        });
+        collection(client, req)
+          .findOneAndUpdate(
+            { _id: new ObjectID(req.body.report_id) },
+            { $set: { reported: true } },
+            { returnOriginal: false }
+          )
+          .then(result => {
+            if (result.value === null) {
+              return res.send("thread doesn't esists!");
+            } else {
+              return res.send("success!");
+            }
+          });
       });
     });
 
@@ -165,9 +167,29 @@ module.exports = function(app) {
             }
           });
       });
-    }).put((req, res) => {
-    connection.then(client => {
-      collection(client, req).findOneAndUpdate({ _id: new ObjectID(req.body.thread_id), replies: { $elemMatch: { _id: new ObjectID()}}})
     })
-  });
+    .put((req, res) => {
+      connection.then(client => {
+        collection(client, req).findOneAndUpdate(
+          {
+            _id: new ObjectID(req.body.thread_id),
+            replies: { $elemMatch: { _id: new ObjectID(req.body.reply_id) } }
+          },
+          {
+            $set: { "replies.$[elem].reported": true }
+          },
+          {
+            arrayFilters: [
+              { "elem._id": { $eq: new ObjectID(req.body.reply_id) } }
+            ]
+          }
+        ).then(result => {
+          if(result.value === null) {
+            return res.send("reply doesn't exist!")
+          } else {
+            return res.send("success!")
+          }
+        });
+      });
+    });
 };

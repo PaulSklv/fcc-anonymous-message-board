@@ -56,26 +56,32 @@ module.exports = function(app) {
       });
     });
 
-  app.route("/api/replies/:board").post((req, res) => {
-    connection.then(client => {
-      collection(client, req).updateOne(
-        { _id: new ObjectID(req.body.thread_id) },
-        {
-          $push: {
-            replies: {
-              _id: new ObjectID(),
-              text: req.body.text,
-              created_on: new Date(),
-              delete_password: req.body.delete_password,
-              reported: false
-            }
+  app.route("/api/replies/:board")
+    .post((req, res) => {
+      connection.then(client => {
+        collection(client, req).findOneAndUpdate(
+          { _id: new ObjectID(req.body.thread_id) },
+          {
+            $push: {
+              replies: {
+                _id: new ObjectID(),
+                text: req.body.text,
+                created_on: new Date(),
+                delete_password: req.body.delete_password,
+                reported: false
+              }
+            },
+            $currentDate: { bumped_on: true }
           },
-          $currentDate: { bumped_on: true }
-        },
-        { new: true }
-      ).then(result => {
-        console.log(result.ops)
-      }).catch(error => console.log(error));
-    });
-  });
+          { returnOriginal: false }
+        ).then(result => {
+          return res.redirect('/b/' + req.params.board + '/' + req.body.thread_id)
+        }).catch(error => console.log(error));
+      })
+  })
+  .get((req, res) => {
+    connection.then(client => {
+      collection(client, req).find()
+    })
+  })
 };

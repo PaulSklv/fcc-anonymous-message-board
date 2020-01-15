@@ -75,6 +75,21 @@ module.exports = function(app) {
             return res.send("something went wrong!");
           });
       });
+    })
+    .put((req, res) => {
+      connection.then(client => {
+        collection(client, req).findOneAndUpdate(
+          { _id: new ObjectID(req.body.report_id) },
+          { $set: { reported: true } },
+          { returnOriginal: false }
+        ).then(result => {
+          if(result.value === null) {
+            return res.send("thread doesn't esists!")
+          } else {
+            return res.send("success!")
+          }
+        });
+      });
     });
 
   app
@@ -143,13 +158,16 @@ module.exports = function(app) {
             { returnOriginal: false }
           )
           .then(result => {
-            console.log(result.value);
-            if(result.value === null) {
-              return res.send("delete password is incorrect!")
+            if (result.value === null) {
+              return res.send("delete password is incorrect!");
             } else {
-              return res.send("successfully deleted!")
+              return res.send("successfully deleted!");
             }
           });
       });
-    });
+    }).put((req, res) => {
+    connection.then(client => {
+      collection(client, req).findOneAndUpdate({ _id: new ObjectID(req.body.thread_id), replies: { $elemMatch: { _id: new ObjectID()}}})
+    })
+  });
 };

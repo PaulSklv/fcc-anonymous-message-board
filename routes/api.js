@@ -56,12 +56,23 @@ module.exports = function(app) {
       });
     })
     .delete((req, res) => {
-    console.log(req.body)
+      console.log(req.body);
       connection.then(client => {
-        collection(client, req).findOneAndDelete({
-          _id: new Object(req.body.thread_id),
-          delete_password: req.body.delete_password
-        }).then(result => console.log(result.value));
+        collection(client, req)
+          .findOneAndDelete({
+            _id: new ObjectID(req.body.thread_id),
+            delete_password: req.body.delete_password
+          })
+          .then(result => {
+            if (result.value === null) {
+              return res.send("password is incorrect!");
+            } else {
+              return res.send("successfully deleted!");
+            }
+          })
+          .catch(error => {
+            return res.send("something went wrong!");
+          });
       });
     });
 
@@ -104,5 +115,8 @@ module.exports = function(app) {
             return res.send(result[0]);
           });
       });
+    })
+    .delete((req, res) => {
+      
     });
 };

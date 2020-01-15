@@ -34,15 +34,14 @@ module.exports = function (app) {
         replies: []
       }).then(result => {
         res.redirect('/b/' + req.params.board);
-        
-      })
+      }).catch(error => {return console.log("Something went wrong", error)})
     })
   })
   .get((req, res) => {
     connection.then(client => {
       collection(client, req).find({ }).toArray().then(result => {
-        
-      })
+        return res.send(result);
+      }).catch(error => {return console.log("Something went wrong", error)})
     })
   })
     

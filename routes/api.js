@@ -16,15 +16,16 @@ const connection = MongoClient.connect(process.env.MONGO_URI, {
   useUnifiedTopology: true
 });
 
-const collection = client => {
-  return client.db("test").collection("messageBoard");
+const collection = (client, req) => {
+  return client.db("messageBoard").collection(req.params.board);
 }
 
 module.exports = function (app) {
   
-  app.route('/api/threads/:board').post((req, res) => {
+  app.route('/api/threads/:board')
+    .post((req, res) => {
     connection.then(client => {
-      collection(client).insertOne({
+      collection(client, req).insertOne({
         text: req.body.text,
         delete_password: req.body.delete_password,
         created_on: new Date(),
@@ -33,6 +34,13 @@ module.exports = function (app) {
         replies: []
       }).then(result => {
         res.redirect('/b/' + req.params.board);
+        
+      })
+    })
+  })
+  .get((req, res) => {
+    connection.then(client => {
+      collection(client, req).find({ }).toArray().then(result => {
         
       })
     })

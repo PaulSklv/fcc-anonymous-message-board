@@ -58,9 +58,8 @@ module.exports = function(app) {
 
   app.route("/api/replies/:board").post((req, res) => {
     connection.then(client => {
-      console.log(req.body.thread_id)
       collection(client, req).updateOne(
-        { _id: req.body.thread_id },
+        { _id: new ObjectID(req.body.thread_id) },
         {
           $push: {
             replies: {
@@ -71,14 +70,11 @@ module.exports = function(app) {
               reported: false
             }
           },
-          $set: {
-            $currentDate: { bumped_on: true }
-          }
+          $currentDate: { bumped_on: true }
         }
       ).then(result => {
-        console.log(result)
-        console.log(result.ops)
-      });
+        console.log(result.result)
+      }).catch(error => console.log(error));
     });
   });
 };

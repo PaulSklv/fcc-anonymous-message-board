@@ -54,37 +54,55 @@ module.exports = function(app) {
             return console.log("Something went wrong", error);
           });
       });
+    })
+    .delete((req, res) => {
+    console.log(req.body)
+      connection.then(client => {
+        collection(client, req).findOneAndDelete({
+          _id: new Object(req.body.thread_id),
+          delete_password: req.body.delete_password
+        }).then(result => console.log(result.value));
+      });
     });
 
-  app.route("/api/replies/:board")
+  app
+    .route("/api/replies/:board")
     .post((req, res) => {
       connection.then(client => {
-        collection(client, req).findOneAndUpdate(
-          { _id: new ObjectID(req.body.thread_id) },
-          {
-            $push: {
-              replies: {
-                _id: new ObjectID(),
-                text: req.body.text,
-                created_on: new Date(),
-                delete_password: req.body.delete_password,
-                reported: false
-              }
+        collection(client, req)
+          .findOneAndUpdate(
+            { _id: new ObjectID(req.body.thread_id) },
+            {
+              $push: {
+                replies: {
+                  _id: new ObjectID(),
+                  text: req.body.text,
+                  created_on: new Date(),
+                  delete_password: req.body.delete_password,
+                  reported: false
+                }
+              },
+              $currentDate: { bumped_on: true }
             },
-            $currentDate: { bumped_on: true }
-          },
-          { returnOriginal: false }
-        ).then(result => {
-          return res.redirect('/b/' + req.params.board + '/' + req.body.thread_id)
-        }).catch(error => console.log(error));
-      })
-  })
-  .get((req, res) => {
-    console.log(req.query)
-    connection.then(client => {
-      collection(client, req).find({ _id: new ObjectID(req.query.thread_id) }).toArray().then(result => {
-        return res.send(result[0]);
-      })
+            { returnOriginal: false }
+          )
+          .then(result => {
+            return res.redirect(
+              "/b/" + req.params.board + "/" + req.body.thread_id
+            );
+          })
+          .catch(error => console.log(error));
+      });
     })
-  })
+    .get((req, res) => {
+      console.log(req.query);
+      connection.then(client => {
+        collection(client, req)
+          .find({ _id: new ObjectID(req.query.thread_id) })
+          .toArray()
+          .then(result => {
+            return res.send(result[0]);
+          });
+      });
+    });
 };

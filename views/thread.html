@@ -26,7 +26,6 @@
       $(function() {
         var currentURL = window.location.pathname.slice(3);
         currentURL = currentURL.split('/');
-        
         var url = "/api/replies/"+currentURL[0];
         $('#threadTitle').text(window.location.pathname);
         $.ajax({

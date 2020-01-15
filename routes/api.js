@@ -80,8 +80,11 @@ module.exports = function(app) {
       })
   })
   .get((req, res) => {
+    console.log(req.query)
     connection.then(client => {
-      collection(client, req).find()
+      collection(client, req).find({ _id: new ObjectID(req.query.thread_id) }).toArray().then(result => {
+        return res.send(result[0]);
+      })
     })
   })
 };

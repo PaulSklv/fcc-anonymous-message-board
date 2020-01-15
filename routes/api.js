@@ -63,17 +63,18 @@ module.exports = function(app) {
         {
           $push: {
             replies: {
-              _id: new Object(),
+              _id: new ObjectID(),
               text: req.body.text,
               created_on: new Date(),
-              delete_passwor: req.body.delete_password,
+              delete_password: req.body.delete_password,
               reported: false
             }
           },
           $currentDate: { bumped_on: true }
-        }
+        },
+        { new: true }
       ).then(result => {
-        console.log(result.result)
+        console.log(result.ops)
       }).catch(error => console.log(error));
     });
   });

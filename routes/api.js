@@ -9,7 +9,7 @@
 'use strict';
 
 var expect = require('chai').expect;
-const MongoClient = require('mongodb').MongoClient;
+const { MongoClient, ObjectID } = require('mongodb');
 
 const connection = MongoClient.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
@@ -45,6 +45,10 @@ module.exports = function (app) {
     })
   })
     
-  app.route('/api/replies/:board');
+  app.route('/api/replies/:board').post((req, res) => {
+    connection.then(client => {
+      collection(client, req).updateOne({ _id: req.body.thread_id })
+    })
+  })
 
 };

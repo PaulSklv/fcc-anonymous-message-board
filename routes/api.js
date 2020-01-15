@@ -32,7 +32,8 @@ module.exports = function(app) {
             created_on: new Date(),
             bumped_on: new Date(),
             reported: false,
-            replies: []
+            replies: [],
+            replycount: 0
           })
           .then(result => {
             res.redirect("/b/" + req.params.board);
@@ -93,7 +94,8 @@ module.exports = function(app) {
                   reported: false
                 }
               },
-              $currentDate: { bumped_on: true }
+              $currentDate: { bumped_on: true },
+              $inc: { replycount: 1 }
             },
             { returnOriginal: false }
           )
@@ -118,20 +120,36 @@ module.exports = function(app) {
     })
     .delete((req, res) => {
       connection.then(client => {
-        collection(client, req).findOneAndUpdate(
-          { _id: new ObjectID(req.body.thread_id), replie },
-          {
-            $pull: {
+        collection(client, req)
+          .findOneAndUpdate(
+            {
+              _id: new ObjectID(req.body.thread_id),
               replies: {
-                _id: new ObjectID(req.body.reply_id),
-                delete_password: req.body.delete_password
+                $elemMatch: {
+                  _id: new ObjectID(req.body.reply_id),
+                  delete_password: req.body.delete_password
+                }
               }
+            },
+            {
+              $pull: {
+                replies: {
+                  _id: new ObjectID(req.body.reply_id),
+                  delete_password: req.body.delete_password
+                }
+              },
+              $inc: { replycount: -1 }
+            },
+            { returnOriginal: false }
+          )
+          .then(result => {
+            console.log(result.value);
+            if(result.value === null) {
+              return res.send("delete password is incorrect!")
+            } else {
+              return res.send("successfully deleted!")
             }
-          },
-          {returnOriginal: false}
-        ).then(result => {
-          console.log(result.value.replies)
-        });
+          });
       });
     });
 };

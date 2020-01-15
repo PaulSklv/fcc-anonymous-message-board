@@ -119,9 +119,19 @@ module.exports = function(app) {
     .delete((req, res) => {
       connection.then(client => {
         collection(client, req).findOneAndUpdate(
-          { _id: new ObjectID(req.body.thread_id) },
-          { $pull: { replies: { _id: new ObjectID(req.body.reply_id) } } }
-        );
+          { _id: new ObjectID(req.body.thread_id), replie },
+          {
+            $pull: {
+              replies: {
+                _id: new ObjectID(req.body.reply_id),
+                delete_password: req.body.delete_password
+              }
+            }
+          },
+          {returnOriginal: false}
+        ).then(result => {
+          console.log(result.value.replies)
+        });
       });
     });
 };

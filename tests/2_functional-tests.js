@@ -27,11 +27,8 @@ suite('Functional Tests', function() {
           delete_password: "test"
         })
         .end((err, res) => {
-          assert.equal(res.status, 200);
-          assert.isObject(res.body);
-          assert.equal(res.body.title, "Title");
-          assert.equal(res.body.delete_password, "test");
-          assert.equal(res.body.board, "test");
+          assert.equal(res.status, 302);
+          assert.equal()
           done();
       })
     });

@@ -42,20 +42,51 @@ suite('Functional Tests', function() {
         .get("/api/threads/board")
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.isObject(res.body);
-          assert.equal(res.body.title, "Title");
-          assert.equal(res.body.delete_password, "test");
-          assert.equal(res.body.board, "test");
+          assert.isArray(res.body);
+          assert.property(res.body[0], "text");
+          assert.property(res.body[0], "_id");
+          assert.property(res.body[0], "created_on");
+          assert.property(res.body[0], "bumped_on");
+          assert.property(res.body[0], "reported");
+          assert.property(res.body[0], "replies");
+          assert.property(res.body[0], "replycount");
           done();
       })
     });
     
-    suite('DELETE', function() {
-      
+    suite('DELETE', function(done) {
+      chai
+        .request(server)
+        .delete("/api/threads")
+        .send({
+          board: "board",
+          thread_id: "Title",
+          delete_password: "test"
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.title, "Title");
+          assert.equal(res.body.delete_password, "test");
+          assert.equal(res.body.board, "test");
+          assert.equal(res.text, "successfully deleted!")
+          done();
+      })
     });
     
-    suite('PUT', function() {
-      
+    suite('PUT', function(done) {
+      chai
+        .request(server)
+        .delete("/api/threads")
+        .send({
+          board: "board",
+          thread_id: "Title",
+          delete_password: "test"
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.equal(res.text, "success!")
+          done();
+      })
     });
     
 

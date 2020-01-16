@@ -57,17 +57,17 @@ suite('Functional Tests', function() {
     suite('DELETE', function(done) {
       chai
         .request(server)
-        .delete("/api/threads")
+        .delete("/api/threads/board")
         .send({
           board: "board",
-          thread_id: "Title",
+          thread_id: "id",
           delete_password: "test"
         })
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.equal(res.body.title, "Title");
+          assert.equal(res.body.thread_id, "id");
           assert.equal(res.body.delete_password, "test");
-          assert.equal(res.body.board, "test");
+          assert.equal(res.body.board, "board");
           assert.equal(res.text, "successfully deleted!")
           done();
       })
@@ -76,14 +76,17 @@ suite('Functional Tests', function() {
     suite('PUT', function(done) {
       chai
         .request(server)
-        .delete("/api/threads")
+        .delete("/api/threads/board")
         .send({
           board: "board",
-          thread_id: "Title",
+          thread_id: "id",
           delete_password: "test"
         })
         .end((err, res) => {
           assert.equal(res.status, 200);
+          assert.equal(res.body.thread_id, "id");
+          assert.equal(res.body.delete_password, "test");
+          assert.equal(res.body.board, "board");
           assert.equal(res.text, "success!")
           done();
       })
@@ -94,8 +97,23 @@ suite('Functional Tests', function() {
   
   suite('API ROUTING FOR /api/replies/:board', function() {
     
-    suite('POST', function() {
-      
+    suite('POST', function(done) {
+      chai
+        .request(server)
+        .post("/api/replies/board")
+        .send({
+          board: "board",
+          title: "Title",
+          delete_password: "test"
+        })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.isObject(res.body);
+          assert.equal(res.body.title, "Title");
+          assert.equal(res.body.delete_password, "test");
+          assert.equal(res.body.board, "test");
+          done();
+      })
     });
     
     suite('GET', function() {

@@ -28,7 +28,6 @@ suite('Functional Tests', function() {
         })
         .end((err, res) => {
           assert.equal(res.status, 302);
-          assert.equal()
           done();
       })
     });
@@ -62,9 +61,6 @@ suite('Functional Tests', function() {
         })
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.equal(res.body.thread_id, "id");
-          assert.equal(res.body.delete_password, "test");
-          assert.equal(res.body.board, "board");
           assert.equal(res.text, "successfully deleted!")
           done();
       })
@@ -81,9 +77,6 @@ suite('Functional Tests', function() {
         })
         .end((err, res) => {
           assert.equal(res.status, 200);
-          assert.equal(res.body.thread_id, "id");
-          assert.equal(res.body.delete_password, "test");
-          assert.equal(res.body.board, "board");
           assert.equal(res.text, "success!")
           done();
       })
@@ -104,17 +97,24 @@ suite('Functional Tests', function() {
           delete_password: "test"
         })
         .end((err, res) => {
-          assert.equal(res.status, 200);
-          assert.isObject(res.body);
-          assert.equal(res.body.title, "Title");
-          assert.equal(res.body.delete_password, "test");
-          assert.equal(res.body.board, "test");
+          assert.equal(res.status, 302);
           done();
       })
     });
     
-    suite('GET', function() {
-      
+    suite('GET', function(done) {
+      chai
+        .request(server)
+        .get("/api/threads/board")
+        .send({ thread_id: "id" })
+        .end((err, res) => {
+          assert.equal(res.status, 200);
+          assert.isArray(res.body);
+          assert.isArray(res.body[0].replies, "replies");
+          assert.property(res.body[0], "replies");
+          assert.property(res.body[0], "replycount");
+          done();
+      })
     });
     
     suite('PUT', function() {
